@@ -1,0 +1,12 @@
+{
+  "name": "dadbot",
+  "version": "1.0.0",
+  "description": "Dadbot 4 Discord",
+  "main": "bot.js",
+  "author": "stars",
+  "license": "MIT",
+  "dependencies": {
+    "discord.io": "github:woor/discord.io#gateway_v6",
+    "winston": "^2.3.1"
+  }
+}

@@ -4,12 +4,13 @@
   "description": "Dadbot 4 Discord",
   "main": "bot.js",
   "scripts": {
-   "start": "node bot.js"
- },
+    "start": "node bot.js"
+  },
   "author": "stars",
   "license": "MIT",
   "dependencies": {
     "discord.io": "github:woor/discord.io#gateway_v6",
+    "mkdirp": "^0.5.1",
     "winston": "^2.3.1"
   }
 }

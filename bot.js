@@ -1,5 +1,6 @@
 var Discord = require('discord.io');
 var logger = require('winston');
+var mkdirp = require("mkdirp");
 // try to find auth and if it's not there try to get auth code from environment
 try {
     var auth = require('./auth.json');
@@ -10,6 +11,7 @@ try {
 }
 // load external data
 var dada = require('./dada.json');
+var beerDirPrefix="data/beer/";
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -21,11 +23,13 @@ var bot = new Discord.Client({
   token: authtoken,
   autorun: true
 });
+
 bot.on('ready', function (evt) {
   logger.info('Connected');
   logger.info('Logged in as: ');
   logger.info(bot.username + ' - (' + bot.id + ')');
 });
+
 bot.on('message', function (user, userID, channelID, message, evt) {
   // Our bot needs to know if it will execute a command
   // It will listen for messages that will start with `!`
@@ -71,6 +75,35 @@ bot.on('message', function (user, userID, channelID, message, evt) {
       var msgQuantity=dada.yesorno.length;
       var msgNumber=randomInt(0,msgQuantity);
       var msg=dada.yesorno[msgNumber];
+      bot.sendMessage({
+        to: channelID,
+        message: msg
+      });
+      break;
+      case 'givedadabeer':
+      // check timestamp
+
+      //   create directory if it doesn't exist
+      var serverID = bot.channels[channelID].guild_id;
+      mkdirp(beerDirPrefix+serverID, function(err) {
+        // if any errors then print the errors to our discord
+        if (err) msg=err;
+         else msg="Successfully created test directory";
+        bot.sendMessage({
+          to: channelID,
+          message: msg
+        });
+      });
+      // has it been more than 30 minutes?
+
+      // no? print fail messages
+
+      // yes? print store beer stats & success message
+
+      // get server name
+
+      // SUCCESS MESSAGE
+      var msg="thanks, <@!"+userID+">!";
       bot.sendMessage({
         to: channelID,
         message: msg

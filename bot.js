@@ -65,6 +65,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         to: channelID,
         message: msg
       });
+      break;
       case 'dadyn':
       case 'dadyesorno':
       var msgQuantity=dada.yesorno.length;
@@ -74,6 +75,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         to: channelID,
         message: msg
       });
+      break;
     }
   }
 });

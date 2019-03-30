@@ -65,6 +65,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         to: channelID,
         message: msg
       });
+      case 'dadyn':
+      case 'dadyesorno':
+      var msgQuantity=dada.yesorno.length;
+      var msgNumber=randomInt(0,msgQuantity);
+      var msg=dada.yesorno[msgNumber];
+      bot.sendMessage({
+        to: channelID,
+        message: msg
+      });
     }
   }
 });

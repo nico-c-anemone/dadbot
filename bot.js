@@ -1,6 +1,13 @@
 var Discord = require('discord.io');
 var logger = require('winston');
-var auth = require('./auth.json');
+// try to find auth and if it's not there try to get auth code from environment
+try {
+    var auth = require('./auth.json');
+    var authtoken = auth.token
+    // do stuff
+} catch (ex) {
+    var authtoken = process.env.TOKEN;
+}
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -20,7 +27,7 @@ bot.on('ready', function (evt) {
 bot.on('message', function (user, userID, channelID, message, evt) {
   // Our bot needs to know if it will execute a command
   // It will listen for messages that will start with `!`
-  if (message.substring(0, 4) == '!dad') {
+  if (message.substring(0, 1) == '!') {
     var args = message.substring(1).split(' ');
     var cmd = args[0];
 
@@ -28,7 +35,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     switch(cmd) {
       // !hidad
       // basic ping command
-      case 'hi':
+      case 'hidad':
       bot.sendMessage({
         to: channelID,
         message: 'Hello, my child!'
@@ -36,7 +43,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
       break;
       // !dadjoke
       // tells a random dad joke
-      case 'joke':
+      case 'dadjoke':
       var jokes=[
         "A ham sandwich walks into a bar and orders a beer. Bartender says, 'Sorry we don't serve food here.'",
         "Why do chicken coops only have two doors? Because if they had four, they would be chicken sedans!",

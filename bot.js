@@ -9,7 +9,7 @@ try {
     var authtoken = process.env.TOKEN;
 }
 // load external data
-var dj = require('./dadjokes.js');
+var dada = require('./dadjokes.json');
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -46,9 +46,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
       // !dadjoke
       // tells a random dad joke
       case 'dadjoke':
-      var numberOfJokes=dadjokes.length;
+      var numberOfJokes=dada.jokes.length;
       var jokeNumber=randomInt(0,numberOfJokes);
-      var joke=dadjokes[jokeNumber];
+      var joke=dada.jokes[jokeNumber];
       bot.sendMessage({
         to: channelID,
         message: joke

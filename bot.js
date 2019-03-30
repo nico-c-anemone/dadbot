@@ -38,23 +38,33 @@ bot.on('message', function (user, userID, channelID, message, evt) {
       // !hidad
       // basic ping command
       case 'hidad':
+      var msgQuantity=dada.hidad.length;
+      var msgNumber=randomInt(0,msgQuantity);
+      var msg=dada.hidad[msgNumber];
       bot.sendMessage({
         to: channelID,
-        message: 'Hello, my child!'
+        message: msg
       });
       break;
       // !dadjoke
       // tells a random dad joke
       case 'dadjoke':
-      var numberOfJokes=dada.jokes.length;
-      var jokeNumber=randomInt(0,numberOfJokes);
-      var joke=dada.jokes[jokeNumber];
+      var msgQuantity=dada.jokes.length;
+      var msgNumber=randomInt(0,msgQuantity);
+      var msg=dada.jokes[msgNumber];
       bot.sendMessage({
         to: channelID,
-        message: joke
+        message: msg
       });
       break;
-      case 'dadquotes':
+      case 'dadquote':
+      var msgQuantity=dada.quotes.length;
+      var msgNumber=randomInt(0,msgQuantity);
+      var msg=dada.quotes[msgNumber];
+      bot.sendMessage({
+        to: channelID,
+        message: msg
+      });
     }
   }
 });

@@ -9,7 +9,7 @@ try {
     var authtoken = process.env.TOKEN;
 }
 // load external data
-var dada = require('./dadjokes.json');
+var dada = require('./dada.json');
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {

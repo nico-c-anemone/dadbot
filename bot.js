@@ -1,17 +1,22 @@
 var Discord = require('discord.io');
 var logger = require('winston');
 var mkdirp = require("mkdirp");
+const fs = require('fs');
 // try to find auth and if it's not there try to get auth code from environment
 try {
-    var auth = require('./auth.json');
-    var authtoken = auth.token
-    // do stuff
+  var auth = require('./auth.json');
+  var authtoken = auth.token
+  // do stuff
 } catch (ex) {
-    var authtoken = process.env.TOKEN;
+  var authtoken = process.env.TOKEN;
 }
 // load external data
 var dada = require('./dada.json');
-var beerDirPrefix="data/beer/";
+
+// some hard-coded data :(
+var dataDirPrefix="data";
+var beerCoolDown=30*60; // 30 minutes per beer
+
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -81,33 +86,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
       });
       break;
       case 'givedadabeer':
-      // check timestamp
-
-      //   create directory if it doesn't exist
-      var serverID = bot.channels[channelID].guild_id;
-      mkdirp(beerDirPrefix+serverID, function(err) {
-        // if any errors then print the errors to our discord
-        if (err) msg=err;
-         else msg="Successfully created test directory";
-        bot.sendMessage({
-          to: channelID,
-          message: msg
-        });
-      });
-      // has it been more than 30 minutes?
-
-      // no? print fail messages
-
-      // yes? print store beer stats & success message
-
-      // get server name
-
-      // SUCCESS MESSAGE
-      var msg="thanks, <@!"+userID+">!";
-      bot.sendMessage({
-        to: channelID,
-        message: msg
-      });
+      giveDadABeer(userID,channelID);
       break;
     }
   }
@@ -116,4 +95,94 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 //helper functions
 function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low)
+}
+
+function createDir(_dirName, callback) {
+  mkdirp(_dirName, function(err) {
+    // if any errors then print the errors to our discord
+    if (err) console.log(err);
+    else {callback();}
+  });
+
+}
+
+function giveDadABeer(_userID,_channelID) {
+  // check timestamp
+  // make sure we have a data directory
+  var dir=dataDirPrefix+"/"
+  createDir(dir,function() {
+    var cooldown=getBeerCoolDownTime();
+    if (cooldown>beerCoolDown) {
+
+      var serverID = bot.channels[_channelID].guild_id;
+      var dir=dataDirPrefix+"/"+serverID+"/"+_userID;
+      createDir(dir,function() {
+
+        // SUCCESS MESSAGE
+        var msg="thanks, <@!"+_userID+">!";
+        bot.sendMessage({
+          to: _channelID,
+          message: msg
+
+        });
+      });
+    } else {
+      var msg="Cool it, <@!"+_userID+">, I'm already drinking a beer! Give me about "+Math.floor((beerCoolDown-cooldown)/60)+" minutes to finish this one.";
+      bot.sendMessage({
+        to: _channelID,
+        message: msg
+      });
+    }
+  });
+}
+
+function getBeerCoolDownTime() {
+  var coolDownTime=beerCoolDown;
+  fileName=dataDirPrefix+"/timestamp.json"
+  if (fs.existsSync(fileName)) {
+    var timestamp = parseInt(JSON.parse(fs.readFileSync(fileName, 'utf8')).unix);
+    if (typeof timestamp != "number" || isNaN(timestamp)) timestamp=0;
+    var currentUnix = Math.round(+new Date()/1000);
+    coolDownTime=((currentUnix-timestamp)>0)?currentUnix-timestamp:0;
+    console.log("timestamp: "+timestamp+"\ncurrent: "+currentUnix+"\ndiff: "+(currentUnix-timestamp));
+    if (coolDownTime>beerCoolDown) {
+      writeTimestampToFile (currentUnix,fileName);
+    }
+  } else {
+    var unix = Math.round(+new Date()/1000);
+    writeTimestampToFile (unix,fileName);
+  }
+  return coolDownTime;
+}
+
+function getBeerCoolDownPassed() {
+  // does timestamp file exist?
+  fileName=dataDirPrefix+"/timestamp.json"
+  pass=false;
+  if (fs.existsSync(fileName)) {
+    var timestamp = parseInt(JSON.parse(fs.readFileSync(fileName, 'utf8')).unix);
+    if (typeof timestamp != "number" || isNaN(timestamp)) timestamp=0;
+    var currentUnix = Math.round(+new Date()/1000);
+    console.log("timestamp: "+timestamp+"\ncurrent: "+currentUnix+"\ndiff: "+(currentUnix-timestamp));
+    if ((currentUnix-timestamp)>beerCoolDown) {
+      pass=writeTimestampToFile (currentUnix,fileName);
+    }
+  } else {
+    var unix = Math.round(+new Date()/1000);
+    pass=writeTimestampToFile (unix,fileName);
+  }
+  return pass;
+}
+
+function writeTimestampToFile (u,f) {
+  var t={"unix":u};
+  console.log("tryna write "+JSON.stringify(t)+" to file "+f)
+  try {
+    fs.writeFileSync(f, JSON.stringify(t));
+    pass=true;
+  } catch (err) {
+    console.log(err);
+    pass=false;
+  }
+  return pass;
 }
